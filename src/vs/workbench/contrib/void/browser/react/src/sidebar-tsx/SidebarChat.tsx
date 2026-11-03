@@ -35,6 +35,7 @@ import { ToolApprovalTypeSwitch } from '../void-settings-tsx/Settings.js';
 
 import { persistentTerminalNameOfId } from '../../../terminalToolService.js';
 import { removeMCPToolNamePrefix } from '../../../../common/mcpServiceTypes.js';
+import { QuindroLogo } from '../util/QuindroLogo.js';
 
 
 
@@ -342,11 +343,12 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 			ref={divRef}
 			className={`
 				gap-x-1
-                flex flex-col p-2 relative input text-left shrink-0
-                rounded-md
+                flex flex-col p-2.5 relative input text-left shrink-0
+                rounded-xl
                 bg-void-bg-1
 				transition-all duration-200
-				border border-void-border-3 focus-within:border-void-border-1 hover:border-void-border-1
+				border border-void-border-2 focus-within:border-sky-500/50 hover:border-void-border-1
+				shadow-sm focus-within:shadow-[0_0_16px_-4px_rgba(56,189,248,0.15)]
 				max-h-[80vh] overflow-y-auto
                 ${className}
             `}
@@ -381,14 +383,14 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 			</div>
 
 			{/* Bottom row */}
-			<div className='flex flex-row justify-between items-end gap-1'>
+			<div className='flex flex-row justify-between items-end gap-1 pt-1'>
 				{showModelDropdown && (
 					<div className='flex flex-col gap-y-1'>
 						<ReasoningOptionSlider featureName={featureName} />
 
-						<div className='flex items-center flex-wrap gap-x-2 gap-y-1 text-nowrap '>
-							{featureName === 'Chat' && <ChatModeDropdown className='text-xs text-void-fg-3 bg-void-bg-1 border border-void-border-2 rounded py-0.5 px-1' />}
-							<ModelDropdown featureName={featureName} className='text-xs text-void-fg-3 bg-void-bg-1 rounded' />
+						<div className='flex items-center flex-wrap gap-x-2 gap-y-1 text-nowrap'>
+							{featureName === 'Chat' && <ChatModeDropdown className='text-xs text-void-fg-3 bg-void-bg-1 border border-void-border-2 rounded-lg py-0.5 px-2 hover:border-void-border-1 transition-all' />}
+							<ModelDropdown featureName={featureName} className='text-xs text-void-fg-3 bg-void-bg-1 rounded-lg border border-void-border-2 py-0.5 px-1 hover:border-void-border-1 transition-all' />
 						</div>
 					</div>
 				)}
@@ -421,13 +423,11 @@ export const ButtonSubmit = ({ className, disabled, ...props }: ButtonProps & Re
 
 	return <button
 		type='button'
-		className={`rounded-full flex-shrink-0 flex-grow-0 flex items-center justify-center
-			${disabled ? 'bg-vscode-disabled-fg cursor-default' : 'bg-white cursor-pointer'}
+		className={`rounded-full flex-shrink-0 flex-grow-0 flex items-center justify-center p-1
+			${disabled ? 'bg-zinc-800 text-zinc-600 cursor-default border border-zinc-700/40' : 'bg-gradient-to-r from-sky-400 to-indigo-500 text-zinc-950 font-bold hover:brightness-110 active:scale-95 shadow-md shadow-sky-500/20 cursor-pointer'}
+			transition-all duration-150
 			${className}
 		`}
-		// data-tooltip-id='void-tooltip'
-		// data-tooltip-content={'Send'}
-		// data-tooltip-place='left'
 		{...props}
 	>
 		<IconArrowUp size={DEFAULT_BUTTON_SIZE} className="stroke-[2] p-[2px]" />
@@ -436,8 +436,9 @@ export const ButtonSubmit = ({ className, disabled, ...props }: ButtonProps & Re
 
 export const ButtonStop = ({ className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) => {
 	return <button
-		className={`rounded-full flex-shrink-0 flex-grow-0 cursor-pointer flex items-center justify-center
-			bg-white
+		className={`rounded-full flex-shrink-0 flex-grow-0 cursor-pointer flex items-center justify-center p-1
+			bg-rose-500/20 text-rose-400 border border-rose-500/40 hover:bg-rose-500/30 active:scale-95
+			animate-pulse transition-all
 			${className}
 		`}
 		type='button'
@@ -3078,7 +3079,7 @@ export const SidebarChat = () => {
 		<VoidInputBox2
 			enableAtToMention
 			className={`min-h-[81px] px-0.5 py-0.5`}
-			placeholder={`@ to mention, ${keybindingString ? `${keybindingString} to add a selection. ` : ''}Enter instructions...`}
+			placeholder="Plan, Build, / for skills, @ for context"
 			onChangeText={onChangeText}
 			onKeyDown={onKeyDown}
 			onFocus={() => { chatThreadsService.setCurrentlyFocusedMessageIdx(undefined) }}
@@ -3092,80 +3093,254 @@ export const SidebarChat = () => {
 
 	const isLandingPage = previousMessages.length === 0
 
+	const currentChatMode = voidSettingsState.globalSettings.chatMode
 
-	const initiallySuggestedPromptsHTML = <div className='flex flex-col gap-2 w-full text-nowrap text-void-fg-3 select-none'>
-		{[
-			'Summarize my codebase',
-			'How do types work in Rust?',
-			'Create a .voidrules file for me'
-		].map((text, index) => (
-			<div
-				key={index}
-				className='py-1 px-2 rounded text-sm bg-zinc-700/5 hover:bg-zinc-700/10 dark:bg-zinc-300/5 dark:hover:bg-zinc-300/10 cursor-pointer opacity-80 hover:opacity-100'
-				onClick={() => onSubmit(text)}
-			>
-				{text}
+	const quickSkillsCards = [
+		{
+			icon: '🧠',
+			title: 'Codebase X-Ray',
+			desc: 'Map architecture & data flow',
+			mode: 'gather' as const,
+			prompt: 'Analyze this codebase structure, explain the core architecture, entry points, and how key modules interact.'
+		},
+		{
+			icon: '🐛',
+			title: 'Bug Surgeon',
+			desc: 'Scan & auto-fix lint errors',
+			mode: 'agent' as const,
+			prompt: 'Check the workspace for any lint or compiler errors using read_lint_errors, diagnose the root causes, and fix them.'
+		},
+		{
+			icon: '🚀',
+			title: 'Feature Builder',
+			desc: 'End-to-end autonomous build',
+			mode: 'agent' as const,
+			prompt: 'Help me design and implement a new feature step by step. First inspect the relevant files and propose a clean plan.'
+		},
+		{
+			icon: '⚡',
+			title: 'Speed Optimizer',
+			desc: 'Refactor for peak performance',
+			mode: 'agent' as const,
+			prompt: 'Analyze the active code for performance bottlenecks, unnecessary re-renders, or slow logic, and optimize it.'
+		},
+		{
+			icon: '🛡️',
+			title: 'Security Shield',
+			desc: 'Audit for vulnerabilities',
+			mode: 'gather' as const,
+			prompt: 'Perform a security and reliability audit on this codebase. Identify any unsafe patterns, edge cases, or potential bugs.'
+		},
+		{
+			icon: '📐',
+			title: 'Project AI Rules',
+			desc: 'Auto-create project rules',
+			mode: 'agent' as const,
+			prompt: 'Inspect this project tech stack and conventions, then create a comprehensive .voidrules file tailored to this repository.'
+		},
+	]
+
+	const quickRadarActions = [
+		{
+			label: '🐛 Auto-Fix Bugs',
+			onClick: () => {
+				voidSettingsService.setGlobalSetting('chatMode', 'agent')
+				onSubmit('Scan active files using read_lint_errors and fix all errors automatically.')
+			}
+		},
+		{
+			label: '🧭 Blueprint Plan',
+			onClick: () => {
+				voidSettingsService.setGlobalSetting('chatMode', 'gather')
+				onSubmit('Create a detailed architectural blueprint and step-by-step execution plan for our current task.')
+			}
+		},
+		{
+			label: '🔍 Code Audit',
+			onClick: () => {
+				onSubmit('Review the recent code changes for bugs, edge cases, security issues, and code quality.')
+			}
+		},
+		{
+			label: '🧪 Write Tests',
+			onClick: () => {
+				voidSettingsService.setGlobalSetting('chatMode', 'agent')
+				onSubmit('Generate unit tests for the active code covering key scenarios and edge cases.')
+			}
+		},
+	]
+
+	const recentThreadIds = Object.keys(chatThreadsState.allThreads ?? {})
+		.sort((a, b) => (chatThreadsState.allThreads[b]?.lastModified ?? 0) - (chatThreadsState.allThreads[a]?.lastModified ?? 0))
+		.slice(0, 3)
+
+	const studioTopHeader = (
+		<div className='flex items-center justify-between px-3 py-2 border-b border-void-border-3 bg-void-bg-2 select-none'>
+			<div className='flex items-center gap-2 overflow-x-auto no-scrollbar max-w-[72%]'>
+				<div className='flex items-center gap-1.5 shrink-0 pr-1'>
+					<QuindroLogo size={18} glow={true} />
+					<span className='text-[11px] font-bold tracking-widest text-void-fg-1 hidden sm:inline'>QUINDRO</span>
+				</div>
+				{recentThreadIds.map((tId, idx) => {
+					const t = chatThreadsState.allThreads[tId]
+					const isActive = tId === chatThreadsState.currentThreadId
+					const firstMsg = t?.messages?.[0]?.displayContent || `Session ${idx + 1}`
+					const shortTitle = firstMsg.length > 12 ? firstMsg.slice(0, 12) + '…' : firstMsg
+					return (
+						<button
+							key={tId}
+							onClick={() => chatThreadsService.switchToThread(tId)}
+							className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all q-card-interactive ${isActive
+								? 'bg-void-bg-1 text-void-fg-1 font-medium border border-void-border-2 shadow-sm'
+								: 'text-void-fg-3 hover:text-void-fg-2 hover:bg-void-bg-2-hover'
+								}`}
+						>
+							<span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-sky-400 animate-pulse' : 'bg-zinc-600'}`} />
+							<span className='truncate max-w-[80px]'>{shortTitle}</span>
+						</button>
+					)
+				})}
+				<button
+					onClick={() => chatThreadsService.openNewThread()}
+					title='Start New AI Session'
+					className='flex items-center justify-center px-1.5 py-0.5 rounded-full text-[11px] text-void-fg-3 hover:text-void-fg-1 hover:bg-void-bg-1 border border-transparent hover:border-void-border-3 transition-all'
+				>
+					+ New
+				</button>
 			</div>
-		))}
-	</div>
+			<div className='flex items-center gap-1 shrink-0'>
+				<button
+					onClick={() => commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID)}
+					title='Open Quindro AI Model Hub & Settings'
+					className='q-pill cursor-pointer text-void-fg-3 hover:text-void-fg-1 hover:border-void-border-2 transition-all'
+				>
+					<span className='text-[10px] text-sky-400'>⚡</span>
+					<span className='text-[11px]'>Models</span>
+				</button>
+			</div>
+		</div>
+	)
 
+	const quickRadarBarHTML = (
+		<div className='flex items-center gap-1.5 px-1 pb-2 overflow-x-auto no-scrollbar select-none'>
+			{quickRadarActions.map((act, i) => (
+				<button
+					key={i}
+					onClick={act.onClick}
+					className='q-pill cursor-pointer whitespace-nowrap text-void-fg-2 hover:text-void-fg-1 hover:border-sky-500/30'
+				>
+					{act.label}
+				</button>
+			))}
+		</div>
+	)
 
+	const modeSelectorBannerHTML = (
+		<div className='p-1 rounded-xl bg-void-bg-1 border border-void-border-3 shadow-sm my-3 select-none'>
+			<div className='grid grid-cols-3 gap-1'>
+				{[
+					{ id: 'agent' as const, icon: '⚡', label: 'Builder Agent', sub: 'Autonomous' },
+					{ id: 'gather' as const, icon: '🧭', label: 'Architect', sub: 'Deep Planning' },
+					{ id: 'normal' as const, icon: '💬', label: 'Fast Chat', sub: 'Instant Q&A' },
+				].map(m => {
+					const active = currentChatMode === m.id
+					return (
+						<div
+							key={m.id}
+							onClick={() => voidSettingsService.setGlobalSetting('chatMode', m.id)}
+							className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg cursor-pointer transition-all duration-200 text-center q-card-interactive ${active
+								? 'bg-void-bg-2 text-void-fg-1 font-semibold border border-void-border-2 shadow-sm'
+								: 'text-void-fg-3 hover:text-void-fg-2 hover:bg-white/[0.02]'
+								}`}
+						>
+							<div className='text-xs font-medium flex items-center gap-1.5'>
+								<span className='text-xs'>{m.icon}</span>
+								<span>{m.label}</span>
+							</div>
+							<div className='text-[10px] opacity-70 truncate max-w-full tracking-tight'>{m.sub}</div>
+						</div>
+					)
+				})}
+			</div>
+		</div>
+	)
+
+	const initiallySuggestedPromptsHTML = (
+		<div className='grid grid-cols-2 gap-2 w-full select-none'>
+			{quickSkillsCards.map((card, index) => (
+				<div
+					key={index}
+					onClick={() => {
+						voidSettingsService.setGlobalSetting('chatMode', card.mode)
+						onSubmit(card.prompt)
+					}}
+					className='flex flex-col gap-1 p-3 rounded-xl bg-void-bg-1 border border-void-border-3 cursor-pointer q-card-interactive group'
+				>
+					<div className='flex items-center justify-between'>
+						<span className='text-base group-hover:scale-110 transition-transform'>{card.icon}</span>
+						<span className='text-[9px] px-1.5 py-0.5 rounded-full bg-void-bg-2 text-void-fg-3 uppercase tracking-wider border border-void-border-3'>
+							{card.mode === 'agent' ? 'Agent' : 'Plan'}
+						</span>
+					</div>
+					<div className='text-xs font-semibold text-void-fg-1 group-hover:text-sky-400 transition-colors'>{card.title}</div>
+					<div className='text-[11px] text-void-fg-3 line-clamp-1'>{card.desc}</div>
+				</div>
+			))}
+		</div>
+	)
 
 	const threadPageInput = <div key={'input' + chatThreadsState.currentThreadId}>
 		<div className='px-4'>
 			<CommandBarInChat />
 		</div>
 		<div className='px-2 pb-2'>
+			{quickRadarBarHTML}
 			{inputChatArea}
 		</div>
 	</div>
 
 	const landingPageInput = <div>
-		<div className='pt-8'>
+		<div className='pt-3'>
+			{modeSelectorBannerHTML}
+			{quickRadarBarHTML}
 			{inputChatArea}
 		</div>
 	</div>
 
 	const landingPageContent = <div
 		ref={sidebarRef}
-		className='w-full h-full max-h-full flex flex-col overflow-auto px-4'
+		className='w-full h-full max-h-full flex flex-col overflow-hidden'
 	>
-		<ErrorBoundary>
-			{landingPageInput}
-		</ErrorBoundary>
-
-		{Object.keys(chatThreadsState.allThreads).length > 1 ? // show if there are threads
+		{studioTopHeader}
+		<div className='w-full flex-1 flex flex-col overflow-auto px-3 pb-4'>
 			<ErrorBoundary>
-				<div className='pt-8 mb-2 text-void-fg-3 text-root select-none pointer-events-none'>Previous Threads</div>
-				<PastThreadsList />
+				{landingPageInput}
 			</ErrorBoundary>
-			:
+
 			<ErrorBoundary>
-				<div className='pt-8 mb-2 text-void-fg-3 text-root select-none pointer-events-none'>Suggestions</div>
+				<div className='pt-5 mb-2 flex items-center justify-between text-void-fg-3 text-xs font-medium uppercase tracking-wider select-none'>
+					<span>⚡ Quindro Power Skills</span>
+					<span className='text-[10px] opacity-70'>1-Click Workflows</span>
+				</div>
 				{initiallySuggestedPromptsHTML}
 			</ErrorBoundary>
-		}
+
+			{Object.keys(chatThreadsState.allThreads).length > 1 && (
+				<ErrorBoundary>
+					<div className='pt-5 mb-2 text-void-fg-3 text-xs font-medium uppercase tracking-wider select-none pointer-events-none'>
+						🕒 Recent Sessions
+					</div>
+					<PastThreadsList />
+				</ErrorBoundary>
+			)}
+		</div>
 	</div>
 
-
-	// const threadPageContent = <div>
-	// 	{/* Thread content */}
-	// 	<div className='flex flex-col overflow-hidden'>
-	// 		<div className={`overflow-hidden ${previousMessages.length === 0 ? 'h-0 max-h-0 pb-2' : ''}`}>
-	// 			<ErrorBoundary>
-	// 				{messagesHTML}
-	// 			</ErrorBoundary>
-	// 		</div>
-	// 		<ErrorBoundary>
-	// 			{inputForm}
-	// 		</ErrorBoundary>
-	// 	</div>
-	// </div>
 	const threadPageContent = <div
 		ref={sidebarRef}
 		className='w-full h-full flex flex-col overflow-hidden'
 	>
-
+		{studioTopHeader}
 		<ErrorBoundary>
 			{messagesHTML}
 		</ErrorBoundary>

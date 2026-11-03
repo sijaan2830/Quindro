@@ -181,143 +181,401 @@ export class EditorGroupWatermark extends Disposable {
 			this.currentDisposables.clear();
 
 
-			// Void - if the workbench is empty, show open
+			// Quindro / Cursor style watermark
+			// Quindro Studio Watermark & Command Deck
 			if (this.contextService.getWorkbenchState() === WorkbenchState.EMPTY) {
 
-				// Create a flex container for buttons with vertical direction
-				const buttonContainer = $('div');
-				buttonContainer.style.display = 'flex';
-				buttonContainer.style.flexDirection = 'column'; // Change to column for vertical stacking
-				buttonContainer.style.alignItems = 'center'; // Center the buttons horizontally
-				buttonContainer.style.gap = '8px'; // Reduce gap between buttons from 16px to 8px
-				buttonContainer.style.marginBottom = '16px';
-				voidIconBox.appendChild(buttonContainer);
+				// Screen 2: Quindro Studio Home / Welcome Experience
+				const homeContainer = $('div.q-home-container');
+				homeContainer.style.display = 'flex';
+				homeContainer.style.flexDirection = 'column';
+				homeContainer.style.alignItems = 'center';
+				homeContainer.style.gap = '28px';
+				homeContainer.style.padding = '48px 24px';
+				homeContainer.style.maxWidth = '720px';
+				homeContainer.style.margin = '0 auto';
+				homeContainer.style.userSelect = 'none';
 
-				// Open a folder
-				const openFolderButton = h('button')
-				openFolderButton.root.classList.add('void-openfolder-button')
-				openFolderButton.root.style.display = 'block'
-				openFolderButton.root.style.width = '124px' // Set width to 124px as requested
-				openFolderButton.root.textContent = 'Open Folder'
-				openFolderButton.root.onclick = () => {
-					this.commandService.executeCommand(isMacintosh && isNative ? OpenFileFolderAction.ID : OpenFolderAction.ID)
-					// if (this.contextKeyService.contextMatchesRules(ContextKeyExpr.and(WorkbenchStateContext.isEqualTo('workspace')))) {
-					// 	this.commandService.executeCommand(OpenFolderViaWorkspaceAction.ID);
-					// } else {
-					// 	this.commandService.executeCommand(isMacintosh ? 'workbench.action.files.openFileFolder' : 'workbench.action.files.openFolder');
-					// }
-				}
-				buttonContainer.appendChild(openFolderButton.root);
+				// Branding Box with Quindro Vector Logo
+				const brandingBox = $('div.q-home-branding');
+				brandingBox.style.display = 'flex';
+				brandingBox.style.flexDirection = 'column';
+				brandingBox.style.alignItems = 'center';
+				brandingBox.style.gap = '6px';
 
-				// Open SSH button
-				const openSSHButton = h('button')
-				openSSHButton.root.classList.add('void-openssh-button')
-				openSSHButton.root.style.display = 'block'
-				openSSHButton.root.style.backgroundColor = '#5a5a5a' // Made darker than the default gray
-				openSSHButton.root.style.width = '124px' // Set width to 124px as requested
-				openSSHButton.root.textContent = 'Open SSH'
-				openSSHButton.root.onclick = () => {
+				const logoBox = $('div.q-home-logo');
+				logoBox.style.display = 'flex';
+				logoBox.style.justifyContent = 'center';
+				logoBox.style.alignItems = 'center';
+				logoBox.style.marginBottom = '6px';
+				logoBox.style.filter = 'drop-shadow(0 0 20px rgba(56, 189, 248, 0.28))';
+				logoBox.innerHTML = `
+					<svg width="64" height="64" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<linearGradient id="q_grad_home" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+								<stop offset="0%" stop-color="#38BDF8"/>
+								<stop offset="50%" stop-color="#818CF8"/>
+								<stop offset="100%" stop-color="#C084FC"/>
+							</linearGradient>
+						</defs>
+						<rect x="22" y="22" width="84" height="84" rx="26" stroke="url(#q_grad_home)" stroke-width="6.5" stroke-linecap="round"/>
+						<circle cx="64" cy="64" r="24" stroke="rgba(255, 255, 255, 0.9)" stroke-width="4.5" stroke-dasharray="110 18"/>
+						<path d="M78 78L106 106" stroke="url(#q_grad_home)" stroke-width="8" stroke-linecap="round"/>
+						<circle cx="106" cy="106" r="4.5" fill="#38BDF8"/>
+						<circle cx="64" cy="64" r="6.5" fill="url(#q_grad_home)"/>
+						<circle cx="64" cy="64" r="2.5" fill="#FFFFFF"/>
+					</svg>
+				`;
+				brandingBox.appendChild(logoBox);
+
+				const title = $('div.q-home-title');
+				title.textContent = 'QUINDRO';
+				title.style.fontSize = '30px';
+				title.style.fontWeight = '800';
+				title.style.letterSpacing = '4px';
+				title.style.background = 'linear-gradient(135deg, #FFFFFF 35%, #A5B4FC 75%, #38BDF8 100%)';
+				(title.style as any)['-webkit-background-clip'] = 'text';
+				(title.style as any)['-webkit-text-fill-color'] = 'transparent';
+
+				const badge = $('div.q-home-badge');
+				badge.textContent = 'STUDIO v1.4.9 · QUANTUM AGENT ENGINE';
+				badge.style.fontSize = '10px';
+				badge.style.fontWeight = '600';
+				badge.style.letterSpacing = '1.8px';
+				badge.style.color = '#38BDF8';
+				badge.style.padding = '3px 12px';
+				badge.style.borderRadius = '9999px';
+				badge.style.background = 'rgba(56, 189, 248, 0.08)';
+				badge.style.border = '1px solid rgba(56, 189, 248, 0.22)';
+				badge.style.marginTop = '2px';
+
+				brandingBox.appendChild(title);
+				brandingBox.appendChild(badge);
+				homeContainer.appendChild(brandingBox);
+
+				// Action Cards Container (4 Cards with Double-Bezel Architecture)
+				const cardsBox = $('div.q-action-cards');
+				cardsBox.style.display = 'grid';
+				cardsBox.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+				cardsBox.style.gap = '14px';
+				cardsBox.style.width = '100%';
+				cardsBox.style.marginTop = '8px';
+
+				const createActionCard = (icon: string, text: string, sub: string, onClick: () => void) => {
+					const card = $('div.q-action-card');
+					card.style.display = 'flex';
+					card.style.flexDirection = 'column';
+					card.style.alignItems = 'flex-start';
+					card.style.gap = '10px';
+					card.style.padding = '18px 18px';
+					card.style.background = 'linear-gradient(180deg, rgba(24, 24, 30, 0.8) 0%, rgba(16, 16, 20, 0.95) 100%)';
+					card.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+					card.style.borderRadius = '14px';
+					card.style.cursor = 'pointer';
+					card.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px -6px rgba(0, 0, 0, 0.4)';
+					card.style.transition = 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+
+					const iconContainer = $('div');
+					iconContainer.style.width = '36px';
+					iconContainer.style.height = '36px';
+					iconContainer.style.borderRadius = '10px';
+					iconContainer.style.display = 'flex';
+					iconContainer.style.alignItems = 'center';
+					iconContainer.style.justifyContent = 'center';
+					iconContainer.style.background = 'rgba(255, 255, 255, 0.05)';
+					iconContainer.style.border = '1px solid rgba(255, 255, 255, 0.08)';
+					iconContainer.style.fontSize = '18px';
+					iconContainer.textContent = icon;
+
+					const textWrap = $('div');
+					textWrap.style.display = 'flex';
+					textWrap.style.flexDirection = 'column';
+					textWrap.style.gap = '2px';
+
+					const cardText = $('div');
+					cardText.textContent = text;
+					cardText.style.fontSize = '13px';
+					cardText.style.fontWeight = '600';
+					cardText.style.color = '#F4F4F5';
+
+					const cardSub = $('div');
+					cardSub.textContent = sub;
+					cardSub.style.fontSize = '11px';
+					cardSub.style.color = '#71717A';
+
+					textWrap.appendChild(cardText);
+					textWrap.appendChild(cardSub);
+					card.appendChild(iconContainer);
+					card.appendChild(textWrap);
+
+					card.onmouseenter = () => {
+						card.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+						card.style.transform = 'translateY(-2px)';
+						card.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 14px 28px -6px rgba(0, 0, 0, 0.55)';
+						iconContainer.style.transform = 'scale(1.08)';
+					};
+					card.onmouseleave = () => {
+						card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+						card.style.transform = 'translateY(0)';
+						card.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px -6px rgba(0, 0, 0, 0.4)';
+						iconContainer.style.transform = 'scale(1)';
+					};
+					card.onmousedown = () => {
+						card.style.transform = 'scale(0.98)';
+					};
+					card.onmouseup = () => {
+						card.style.transform = 'translateY(-2px)';
+					};
+					card.onclick = onClick;
+					return card;
+				};
+
+				cardsBox.appendChild(createActionCard('📁', 'Open Project', 'Local Workspace', () => {
+					this.commandService.executeCommand(isMacintosh && isNative ? OpenFileFolderAction.ID : OpenFolderAction.ID);
+				}));
+				cardsBox.appendChild(createActionCard('⎇', 'Clone Repo', 'Git Repository', () => {
+					this.commandService.executeCommand('git.clone');
+				}));
+				cardsBox.appendChild(createActionCard('🌐', 'Remote SSH', 'Cloud Server', () => {
 					this.viewsService.openViewContainer(REMOTE_EXPLORER_VIEWLET_ID);
-				}
-				buttonContainer.appendChild(openSSHButton.root);
+				}));
+				cardsBox.appendChild(createActionCard('⚡', 'AI Model Hub', 'Keys & Settings', () => {
+					this.commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID);
+				}));
 
+				homeContainer.appendChild(cardsBox);
 
-				// Recents
+				// Recents List
 				if (recentlyOpened.length !== 0) {
+					const recentsSection = $('div.q-recents-section');
+					recentsSection.style.width = '100%';
+					recentsSection.style.marginTop = '16px';
+					recentsSection.style.background = 'rgba(18, 18, 22, 0.5)';
+					recentsSection.style.border = '1px solid rgba(255, 255, 255, 0.06)';
+					recentsSection.style.borderRadius = '14px';
+					recentsSection.style.padding = '14px 18px';
 
-					voidIconBox.append(
-						...recentlyOpened.map((w, i) => {
+					const recentsHeader = $('div.q-recents-header');
+					recentsHeader.style.display = 'flex';
+					recentsHeader.style.justifyContent = 'space-between';
+					recentsHeader.style.fontSize = '11px';
+					recentsHeader.style.fontWeight = '600';
+					recentsHeader.style.letterSpacing = '1px';
+					recentsHeader.style.textTransform = 'uppercase';
+					recentsHeader.style.color = '#71717A';
+					recentsHeader.style.marginBottom = '10px';
 
-							let fullPath: string;
-							let windowOpenable: IWindowOpenable;
-							if (isRecentFolder(w)) {
-								windowOpenable = { folderUri: w.folderUri };
-								fullPath = w.label || this.labelService.getWorkspaceLabel(w.folderUri, { verbose: Verbosity.LONG });
-							}
-							else {
-								return null
-								// fullPath = w.label || this.labelService.getWorkspaceLabel(w.workspace, { verbose: Verbosity.LONG });
-								// windowOpenable = { workspaceUri: w.workspace.configPath };
-							}
+					const recentsTitle = $('span');
+					recentsTitle.textContent = 'Recent Projects';
+					recentsHeader.appendChild(recentsTitle);
+					recentsSection.appendChild(recentsHeader);
 
+					const recentsList = $('div.q-recents-list');
+					recentsList.style.display = 'flex';
+					recentsList.style.flexDirection = 'column';
+					recentsList.style.gap = '4px';
 
-							const { name, parentPath } = splitRecentLabel(fullPath);
+					recentlyOpened.slice(0, 5).forEach((w) => {
+						if (!isRecentFolder(w)) return;
+						const fullPath = w.label || this.labelService.getWorkspaceLabel(w.folderUri, { verbose: Verbosity.LONG });
+						const { name, parentPath } = splitRecentLabel(fullPath);
 
-							const linkSpan = $('span');
-							linkSpan.classList.add('void-link')
-							linkSpan.style.display = 'flex'
-							linkSpan.style.gap = '4px'
-							linkSpan.style.padding = '8px'
+						const item = $('div.q-recent-item');
+						item.style.display = 'flex';
+						item.style.justifyContent = 'space-between';
+						item.style.alignItems = 'center';
+						item.style.padding = '8px 12px';
+						item.style.borderRadius = '8px';
+						item.style.cursor = 'pointer';
+						item.style.background = 'transparent';
+						item.style.transition = 'all 0.15s ease';
 
-							linkSpan.addEventListener('click', e => {
-								this.hostService.openWindow([windowOpenable], {
-									forceNewWindow: e.ctrlKey || e.metaKey,
-									remoteAuthority: w.remoteAuthority || null // local window if remoteAuthority is not set or can not be deducted from the openable
-								});
-								e.preventDefault();
-								e.stopPropagation();
+						const leftSide = $('div');
+						leftSide.style.display = 'flex';
+						leftSide.style.alignItems = 'center';
+						leftSide.style.gap = '8px';
+
+						const iconFolder = $('span');
+						iconFolder.textContent = '📂';
+						iconFolder.style.fontSize = '14px';
+
+						const nameSpan = $('span');
+						nameSpan.textContent = name;
+						nameSpan.style.color = '#E4E4E7';
+						nameSpan.style.fontSize = '13px';
+						nameSpan.style.fontWeight = '500';
+
+						leftSide.appendChild(iconFolder);
+						leftSide.appendChild(nameSpan);
+
+						const pathSpan = $('span');
+						pathSpan.textContent = parentPath;
+						pathSpan.style.color = '#71717A';
+						pathSpan.style.fontSize = '11px';
+
+						item.appendChild(leftSide);
+						item.appendChild(pathSpan);
+
+						item.onmouseenter = () => {
+							item.style.background = 'rgba(255, 255, 255, 0.05)';
+							nameSpan.style.color = '#38BDF8';
+						};
+						item.onmouseleave = () => {
+							item.style.background = 'transparent';
+							nameSpan.style.color = '#E4E4E7';
+						};
+
+						item.onclick = (e) => {
+							this.hostService.openWindow([{ folderUri: w.folderUri }], {
+								forceNewWindow: e.ctrlKey || e.metaKey,
+								remoteAuthority: w.remoteAuthority || null
 							});
+						};
 
-							const nameSpan = $('span');
-							nameSpan.innerText = name;
-							nameSpan.title = fullPath;
-							linkSpan.appendChild(nameSpan);
+						recentsList.appendChild(item);
+					});
 
-							const dirSpan = $('span');
-							dirSpan.style.paddingLeft = '4px';
-							dirSpan.style.whiteSpace = 'nowrap';
-							dirSpan.style.overflow = 'hidden';
-							dirSpan.style.maxWidth = '300px';
-							dirSpan.innerText = parentPath;
-							dirSpan.title = fullPath;
-
-							linkSpan.appendChild(dirSpan);
-
-							return linkSpan
-						})
-							.filter(v => !!v)
-							.slice(0, 5) // take 5 most recent
-					)
+					recentsSection.appendChild(recentsList);
+					homeContainer.appendChild(recentsSection);
 				}
+
+				voidIconBox.appendChild(homeContainer);
 
 			}
 			else {
 
-				// show them Void keybindings
-				const keys = this.keybindingService.lookupKeybinding(VOID_CTRL_L_ACTION_ID);
-				const dl = append(voidIconBox, $('dl'));
-				const dt = append(dl, $('dt'));
-				dt.textContent = 'Chat'
-				const dd = append(dl, $('dd'));
-				const label = new KeybindingLabel(dd, OS, { renderUnboundKeybindings: true, ...defaultKeybindingLabelStyles });
-				if (keys)
-					label.set(keys);
-				this.currentDisposables.add(label);
+				// Screen 3: Interactive Quindro AI Command Deck (Active Workspace State)
+				const centerCanvas = $('div.q-center-canvas');
+				centerCanvas.style.display = 'flex';
+				centerCanvas.style.flexDirection = 'column';
+				centerCanvas.style.alignItems = 'center';
+				centerCanvas.style.justifyContent = 'center';
+				centerCanvas.style.gap = '22px';
+				centerCanvas.style.padding = '44px 20px';
+				centerCanvas.style.userSelect = 'none';
 
+				// Quindro Logo & Header
+				const logoWrapper = $('div.q-canvas-logo');
+				logoWrapper.style.display = 'flex';
+				logoWrapper.style.justifyContent = 'center';
+				logoWrapper.style.alignItems = 'center';
+				logoWrapper.style.filter = 'drop-shadow(0 0 18px rgba(56, 189, 248, 0.25))';
+				logoWrapper.innerHTML = `
+					<svg width="52" height="52" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<linearGradient id="q_grad_deck" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+								<stop offset="0%" stop-color="#38BDF8"/>
+								<stop offset="50%" stop-color="#818CF8"/>
+								<stop offset="100%" stop-color="#C084FC"/>
+							</linearGradient>
+						</defs>
+						<rect x="22" y="22" width="84" height="84" rx="26" stroke="url(#q_grad_deck)" stroke-width="6.5" stroke-linecap="round"/>
+						<circle cx="64" cy="64" r="24" stroke="rgba(255, 255, 255, 0.88)" stroke-width="4.5" stroke-dasharray="110 18"/>
+						<path d="M78 78L106 106" stroke="url(#q_grad_deck)" stroke-width="8" stroke-linecap="round"/>
+						<circle cx="106" cy="106" r="4.5" fill="#38BDF8"/>
+						<circle cx="64" cy="64" r="6.5" fill="url(#q_grad_deck)"/>
+						<circle cx="64" cy="64" r="2.5" fill="#FFFFFF"/>
+					</svg>
+				`;
+				centerCanvas.appendChild(logoWrapper);
 
-				const keys2 = this.keybindingService.lookupKeybinding(VOID_CTRL_K_ACTION_ID);
-				const dl2 = append(voidIconBox, $('dl'));
-				const dt2 = append(dl2, $('dt'));
-				dt2.textContent = 'Quick Edit'
-				const dd2 = append(dl2, $('dd'));
-				const label2 = new KeybindingLabel(dd2, OS, { renderUnboundKeybindings: true, ...defaultKeybindingLabelStyles });
-				if (keys2)
-					label2.set(keys2);
-				this.currentDisposables.add(label2);
+				const badgeBox = $('div.q-canvas-badge');
+				badgeBox.textContent = 'QUINDRO AI COMMAND DECK';
+				badgeBox.style.fontSize = '11px';
+				badgeBox.style.letterSpacing = '2px';
+				badgeBox.style.color = '#38BDF8';
+				badgeBox.style.fontWeight = '600';
+				badgeBox.style.padding = '3px 12px';
+				badgeBox.style.borderRadius = '9999px';
+				badgeBox.style.background = 'rgba(56, 189, 248, 0.08)';
+				badgeBox.style.border = '1px solid rgba(56, 189, 248, 0.2)';
+				centerCanvas.appendChild(badgeBox);
 
-				// const keys3 = this.keybindingService.lookupKeybinding('workbench.action.openGlobalKeybindings');
-				// const button3 = append(recentsBox, $('button'));
-				// button3.textContent = `Void Settings`
-				// button3.style.display = 'block'
-				// button3.style.marginLeft = 'auto'
-				// button3.style.marginRight = 'auto'
-				// button3.classList.add('void-settings-watermark-button')
+				// Interactive Command List with Doppelrand styling
+				const shortcutsList = $('div.q-shortcuts-list');
+				shortcutsList.style.display = 'flex';
+				shortcutsList.style.flexDirection = 'column';
+				shortcutsList.style.gap = '8px';
+				shortcutsList.style.minWidth = '380px';
+				shortcutsList.style.maxWidth = '460px';
 
-				// const label3 = new KeybindingLabel(button3, OS, { renderUnboundKeybindings: true, ...defaultKeybindingLabelStyles });
-				// if (keys3)
-				// 	label3.set(keys3);
-				// button3.onclick = () => {
-				// 	this.commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID)
+				const shortcutsData = [
+					{ label: '⚡ Focus AI Builder Agent', keys: 'Ctrl + L', cmd: VOID_CTRL_L_ACTION_ID },
+					{ label: '✨ Inline Code Surgeon', keys: 'Ctrl + K', cmd: VOID_CTRL_K_ACTION_ID },
+					{ label: '🔍 Quick Search Files', keys: 'Ctrl + P', cmd: 'workbench.action.quickOpen' },
+					{ label: '💻 Toggle Integrated Terminal', keys: 'Ctrl + J', cmd: 'workbench.action.terminal.toggleTerminal' },
+					{ label: '⚙️ AI Model Hub & API Keys', keys: 'Settings', cmd: VOID_OPEN_SETTINGS_ACTION_ID },
+					{ label: '📂 Switch Workspace Folder', keys: 'Ctrl + K Ctrl + O', cmd: isMacintosh && isNative ? OpenFileFolderAction.ID : OpenFolderAction.ID },
+				];
+
+				shortcutsData.forEach(s => {
+					const row = $('div.q-shortcut-row');
+					row.style.display = 'flex';
+					row.style.justifyContent = 'space-between';
+					row.style.alignItems = 'center';
+					row.style.gap = '20px';
+					row.style.padding = '10px 16px';
+					row.style.borderRadius = '10px';
+					row.style.background = 'rgba(20, 20, 24, 0.7)';
+					row.style.border = '1px solid rgba(255, 255, 255, 0.07)';
+					row.style.boxShadow = 'inset 0 1px 0 rgba(255, 255, 255, 0.05)';
+					row.style.cursor = 'pointer';
+					row.style.transition = 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
+
+					const labelSpan = $('span');
+					labelSpan.textContent = s.label;
+					labelSpan.style.fontSize = '13px';
+					labelSpan.style.fontWeight = '500';
+					labelSpan.style.color = '#D4D4D8';
+					labelSpan.style.transition = 'color 0.15s ease';
+
+					const kbdSpan = $('span');
+					kbdSpan.textContent = s.keys;
+					kbdSpan.style.fontSize = '11px';
+					kbdSpan.style.fontFamily = 'monospace';
+					kbdSpan.style.background = 'rgba(255, 255, 255, 0.06)';
+					kbdSpan.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+					kbdSpan.style.padding = '3px 8px';
+					kbdSpan.style.borderRadius = '5px';
+					kbdSpan.style.color = '#A1A1AA';
+
+					row.appendChild(labelSpan);
+					row.appendChild(kbdSpan);
+
+					row.onmouseenter = () => {
+						row.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+						row.style.background = 'rgba(28, 28, 34, 0.85)';
+						row.style.transform = 'translateY(-1px)';
+						labelSpan.style.color = '#FFFFFF';
+						kbdSpan.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+						kbdSpan.style.color = '#38BDF8';
+					};
+					row.onmouseleave = () => {
+						row.style.borderColor = 'rgba(255, 255, 255, 0.07)';
+						row.style.background = 'rgba(20, 20, 24, 0.7)';
+						row.style.transform = 'translateY(0)';
+						labelSpan.style.color = '#D4D4D8';
+						kbdSpan.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+						kbdSpan.style.color = '#A1A1AA';
+					};
+					row.onmousedown = () => {
+						row.style.transform = 'scale(0.985)';
+					};
+					row.onmouseup = () => {
+						row.style.transform = 'translateY(-1px)';
+					};
+
+					row.onclick = () => {
+						this.commandService.executeCommand(s.cmd);
+					};
+
+					shortcutsList.appendChild(row);
+				});
+
+				centerCanvas.appendChild(shortcutsList);
+				voidIconBox.appendChild(centerCanvas);
+
+			}
 				// }
 				// this.currentDisposables.add(label3);
 

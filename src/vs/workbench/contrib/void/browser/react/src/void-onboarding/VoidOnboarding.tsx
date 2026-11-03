@@ -12,6 +12,7 @@ import { OllamaSetupInstructions, OneClickSwitchButton, SettingsForProvider, Mod
 import { ColorScheme } from '../../../../../../../platform/theme/common/theme.js';
 import ErrorBoundary from '../sidebar-tsx/ErrorBoundary.js';
 import { isLinux } from '../../../../../../../base/common/platform.js';
+import { QuindroLogo } from '../util/QuindroLogo.js';
 
 const OVERRIDE_VALUE = false
 
@@ -40,28 +41,11 @@ export const VoidOnboarding = () => {
 }
 
 const VoidIcon = () => {
-	const accessor = useAccessor()
-	const themeService = accessor.get('IThemeService')
-
-	const divRef = useRef<HTMLDivElement | null>(null)
-
-	useEffect(() => {
-		// void icon style
-		const updateTheme = () => {
-			const theme = themeService.getColorTheme().type
-			const isDark = theme === ColorScheme.DARK || theme === ColorScheme.HIGH_CONTRAST_DARK
-			if (divRef.current) {
-				divRef.current.style.maxWidth = '220px'
-				divRef.current.style.opacity = '50%'
-				divRef.current.style.filter = isDark ? '' : 'invert(1)' //brightness(.5)
-			}
-		}
-		updateTheme()
-		const d = themeService.onDidColorThemeChange(updateTheme)
-		return () => d.dispose()
-	}, [])
-
-	return <div ref={divRef} className='@@void-void-icon' />
+	return (
+		<div className='flex items-center justify-center p-6'>
+			<QuindroLogo size={112} glow={true} />
+		</div>
+	)
 }
 
 const FADE_DURATION_MS = 2000
@@ -547,7 +531,7 @@ const VoidOnboardingContent = () => {
 					voidMetricsService.capture('Completed Onboarding', { selectedProviderName, wantToUseOption })
 				}}
 				ringSize={voidSettingsState.globalSettings.isOnboardingComplete ? 'screen' : undefined}
-			>Enter the Void</PrimaryActionButton>
+			>Enter Quindro</PrimaryActionButton>
 		</div>
 	</div>
 
@@ -596,7 +580,7 @@ const VoidOnboardingContent = () => {
 		0: <OnboardingPageShell
 			content={
 				<div className='flex flex-col items-center gap-8'>
-					<div className="text-5xl font-light text-center">Welcome to Void</div>
+					<div className="text-5xl font-light text-center tracking-wider">Welcome to Quindro</div>
 
 					{/* Slice of Void image */}
 					<div className='max-w-md w-full h-[30vh] mx-auto flex items-center justify-center'>

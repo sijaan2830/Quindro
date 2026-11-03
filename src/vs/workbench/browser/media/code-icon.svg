@@ -1,1 +1,20 @@
-<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><style>.st0{fill:#f6f6f6;fill-opacity:0}.st1{fill:#fff}.st2{fill:#167abf}</style><path class="st0" d="M1024 1024H0V0h1024v1024z"/><path class="st1" d="M1024 85.333v853.333H0V85.333h1024z"/><path class="st2" d="M0 85.333h298.667v853.333H0V85.333zm1024 0v853.333H384V85.333h640zm-554.667 160h341.333v-64H469.333v64zm341.334 533.334H469.333v64h341.333l.001-64zm128-149.334H597.333v64h341.333l.001-64zm0-149.333H597.333v64h341.333l.001-64zm0-149.333H597.333v64h341.333l.001-64z"/></svg>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="q_grad_outer" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <filter id="q_glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="64" cy="64" r="44" fill="url(#q_grad_outer)" opacity="0.22" filter="url(#q_glow)"/>
+  <rect x="22" y="22" width="84" height="84" rx="26" stroke="url(#q_grad_outer)" stroke-width="6.5" stroke-linecap="round"/>
+  <circle cx="64" cy="64" r="24" stroke="rgba(255, 255, 255, 0.9)" stroke-width="4.5" stroke-dasharray="110 18"/>
+  <path d="M78 78L106 106" stroke="url(#q_grad_outer)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="106" cy="106" r="4" fill="#38BDF8"/>
+  <circle cx="64" cy="64" r="6.5" fill="url(#q_grad_outer)"/>
+  <circle cx="64" cy="64" r="2.5" fill="#FFFFFF"/>
+</svg>

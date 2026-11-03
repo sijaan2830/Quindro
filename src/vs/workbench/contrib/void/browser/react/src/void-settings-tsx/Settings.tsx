@@ -23,6 +23,7 @@ import { MCPServer } from '../../../../common/mcpServiceTypes.js';
 import { useMCPServiceState } from '../util/services.js';
 import { OPT_OUT_KEY } from '../../../../common/storageKeys.js';
 import { StorageScope, StorageTarget } from '../../../../../../../platform/storage/common/storage.js';
+import { QuindroLogo } from '../util/QuindroLogo.js';
 
 type Tab =
 	| 'models'
@@ -1064,12 +1065,12 @@ export const Settings = () => {
 		if (t === 'Chats') {
 			// Export chat threads
 			dataStr = JSON.stringify(chatThreadsService.state, null, 2)
-			downloadName = 'void-chats.json'
+			downloadName = 'quindro-chats.json'
 		}
 		else if (t === 'Settings') {
 			// Export user settings
 			dataStr = JSON.stringify(voidSettingsService.state, null, 2)
-			downloadName = 'void-settings.json'
+			downloadName = 'quindro-settings.json'
 		}
 		else {
 			dataStr = ''
@@ -1124,12 +1125,21 @@ export const Settings = () => {
 
 	return (
 		<div className={`@@void-scope ${isDark ? 'dark' : ''}`} style={{ height: '100%', width: '100%', overflow: 'auto' }}>
-			<div className="flex flex-col md:flex-row w-full gap-6 max-w-[900px] mx-auto mb-32" style={{ minHeight: '80vh' }}>
+			<div className="flex flex-col md:flex-row w-full gap-6 max-w-[960px] mx-auto mb-32" style={{ minHeight: '80vh' }}>
 				{/* ──────────────  SIDEBAR  ────────────── */}
 
 				<aside className="md:w-1/4 w-full p-6 shrink-0">
+					{/* Brand Logo and Title */}
+					<div className="flex items-center gap-2.5 mb-6 px-1">
+						<QuindroLogo size={24} glow={true} />
+						<div className="flex flex-col">
+							<span className="text-sm font-bold tracking-wider text-void-fg-1">QUINDRO</span>
+							<span className="text-[10px] text-sky-400 font-medium">Model Hub & Config</span>
+						</div>
+					</div>
+
 					{/* vertical tab list */}
-					<div className="flex flex-col gap-2 mt-12">
+					<div className="flex flex-col gap-1.5">
 						{navItems.map(({ tab, label }) => (
 							<button
 								key={tab}
@@ -1142,10 +1152,10 @@ export const Settings = () => {
 									}
 								}}
 								className={`
-          py-2 px-4 rounded-md text-left transition-all duration-200
+          py-2 px-3.5 rounded-lg text-left text-xs transition-all duration-200 q-card-interactive
           ${selectedSection === tab
-										? 'bg-[#0e70c0]/80 text-white font-medium shadow-sm'
-										: 'bg-void-bg-2 hover:bg-void-bg-2/80 text-void-fg-1'}
+										? 'bg-void-bg-1 text-void-fg-1 font-semibold border border-void-border-2 shadow-sm'
+										: 'bg-transparent hover:bg-void-bg-2/80 text-void-fg-3 hover:text-void-fg-1'}
         `}
 							>
 								{label}
@@ -1161,16 +1171,22 @@ export const Settings = () => {
 
 					<div className='max-w-3xl'>
 
-						<h1 className='text-2xl w-full'>{`Void's Settings`}</h1>
+						<div className='flex items-center gap-3 mb-3'>
+							<QuindroLogo size={32} glow={true} />
+							<div>
+								<h1 className='text-2xl font-bold tracking-tight text-void-fg-1'>Quindro AI Model Hub & Settings</h1>
+								<div className='text-xs text-void-fg-3'>Configure foundation models, custom API keys, MCP servers, and agent personas</div>
+							</div>
+						</div>
 
-						<div className='w-full h-[1px] my-2' />
+						<div className='w-full h-[1px] my-2 bg-void-border-3' />
 
 						{/* Models section (formerly FeaturesTab) */}
 						<ErrorBoundary>
 							<RedoOnboardingButton />
 						</ErrorBoundary>
 
-						<div className='w-full h-[1px] my-4' />
+						<div className='w-full h-[1px] my-4 bg-void-border-3' />
 
 						{/* All sections in flex container with gap-12 */}
 						<div className='flex flex-col gap-12'>
