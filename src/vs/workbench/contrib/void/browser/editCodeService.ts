@@ -290,7 +290,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 	// 				run: () => { this._commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID) }
 	// 			}]
 	// 		},
-	// 		source: details ? `(Hold ${isMacintosh ? 'Option' : 'Alt'} to hover) - ${details}\n\nIf this persists, feel free to [report](https://github.com/voideditor/void/issues/new) it.` : undefined
+	// 		source: details ? `(Hold ${isMacintosh ? 'Option' : 'Alt'} to hover) - ${details}\n\nIf this persists, feel free to [report](https://github.com/sijaan2830/Quindro/issues/new) it.` : undefined
 	// 	})
 	// }
 
@@ -1968,7 +1968,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 
 						const blocks = extractSearchReplaceBlocks(fullText)
 						if (blocks.length === 0) {
-							this._notificationService.info(`Void: We ran Fast Apply, but the LLM didn't output any changes.`)
+							this._notificationService.info(`Quindro: We ran Fast Apply, but the LLM didn't output any changes.`)
 						}
 						this._writeURIText(uri, originalFileCode, 'wholeFileRange', { shouldRealignDiffAreas: true })
 

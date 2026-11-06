@@ -10,8 +10,8 @@ if "%VSCODE_SKIP_PRELAUNCH%"=="" node build/lib/preLaunch.js
 
 set CODE=.build\electron\Quindro.exe
 if not exist "%CODE%" (
-	if exist ".build\electron\Void.exe" (
-		set CODE=.build\electron\Void.exe
+	if exist ".build\electron\Code.exe" (
+		set CODE=.build\electron\Code.exe
 	)
 )
 

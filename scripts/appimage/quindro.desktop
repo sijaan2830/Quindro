@@ -1,15 +1,15 @@
 [Desktop Entry]
-Name=Void
+Name=Quindro
 Comment=Open source AI code editor.
 GenericName=Text Editor
-Exec=void %F
-Icon=void
+Exec=quindro %F
+Icon=quindro
 Type=Application
 StartupNotify=false
-StartupWMClass=Void
+StartupWMClass=Quindro
 Categories=TextEditor;Development;IDE;
-MimeType=application/x-void-workspace;
-Keywords=void;
+MimeType=application/x-quindro-workspace;
+Keywords=quindro;
 Actions=new-empty-window;
 
 [Desktop Action new-empty-window]
@@ -23,5 +23,5 @@ Name[ko]=새 빈 창
 Name[ru]=Новое пустое окно
 Name[zh_CN]=新建空窗口
 Name[zh_TW]=開新空視窗
-Exec=void --new-window %F
-Icon=void
+Exec=quindro --new-window %F
+Icon=quindro

@@ -1,0 +1,2 @@
+This is Quindro - the modern AI code editor.
+Most custom code lives in src/vs/workbench/contrib/quindro (or contrib/void).
