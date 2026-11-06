@@ -3136,7 +3136,7 @@ export const SidebarChat = () => {
 			title: 'Project AI Rules',
 			desc: 'Auto-create project rules',
 			mode: 'agent' as const,
-			prompt: 'Inspect this project tech stack and conventions, then create a comprehensive .voidrules file tailored to this repository.'
+			prompt: 'Inspect this project tech stack and conventions, then create a comprehensive .quindrorules file tailored to this repository.'
 		},
 	]
 
